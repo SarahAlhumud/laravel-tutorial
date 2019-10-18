@@ -1,0 +1,495 @@
+/* ********************** Start Sarah's Comments **********************
+
+This project is explain laravel concepts from this tutorial https://laracasts.com/series/laravel-from-scratch-2018/
+
+*/
+
+
+/* ********************** Start Sarah's Comments **********************
+Laravel uses Active Record of ORM (Object-relational mapping) pattern
+https://medium.com/oceanize-geeks/the-active-record-and-data-mappers-of-orm-pattern-eefb8262b7bb
+
+Migration is like a version control for the database
+
+// It will create Migration table that is not created before, "the up method in table's class"
+$ php artisan migrate
+
+// It will roll back 'drop' Migration table that is created before, "the down method in table's class"
+$ php artisan migrate:rollback
+
+------------
+
+Eloquent model is the Active Record implementation
+Model is single record. e.g. if we have a projects table, project record will be a model
+
+// following cmd will create table called projects, it will create file in /database/migration as create_projects_table.php
+$ php artisan make:migration create_projects_table
+
+// following cmd will create model record called Project, it will create file in /app as Project.php
+$ php artisan make:model Project
+
+********************** End Sarah's Comments ********************** */
+
+
+/* ********************** Start Sarah's Comments **********************
+To enter laravel playground:
+$ php artisan tinker
+
+- To create a project object:
+
+>>> $project = new App\Project;
+>>> $project->title = 'First project';
+>>> $project->description = 'description of first project';
+>>> $project->save();
+
+- collections are like glorified arrays on steroids
+- to show all projects objects(records) -collection-:
+>>> App\Project::all();
+- to show first project objects(records):
+>>> App\Project::first();
+or
+>>> App\Project::all()[0];
+
+>>> App\Project::latest()->first();
+
+- to get title of all projects:
+>>> App\Project::all()->map->title;
+
+------------------
+Laravel follows a convention called (PSR-4 which is an auto-loading specification)??.
+
+namespace: \App\Project It is means in 'app' directory and project file.
+we used namespace to organized and structured files and distinguished between them.
+
+if we want use a specific file in a file:
+- we have to use '\' then full namespace path before file name.
+OR
+- 'use' + ' ' + '\' + full namespace path before file name, then we can use file name without full path
+
+********************** End Sarah's Comments ********************** */
+
+/* ********************** Start Sarah's Comments **********************
+to create migration file and table called 'projects', write in command 'php artisan make:migration create_projects_table'
+if laravel doesn't find 'create', it will update the table
+
+********************** End Sarah's Comments ********************** */
+
+/* ********************** Episode 9 **********************
+Directory Structure Review:
+- .editorconfig: you can delete if you want. It contains setting and format of editor.
+- artisan: when run cmd '$ php artisan', you trigger this file
+- composer.json: specifies configuration like: dependencies
+- composer.lock: takes all dependencies and lock them to ensure consistency. Other person who install the project,
+can install identical version of dependencies. This file will committed to VCS
+- package.json: helps front end compilation
+- webpack.mix.js: wrapper about webpack to compile js, sass, less ..etc.
+- yarn.lock: similar to composer.lock
+* Directories *:
+- vendor: all composer's dependencies will be installed. You'll not edit these files.
+- tests: tests/features will contain your tests.
+- storage: logs and storage files.
+- routes: web.php: registers routing of website, console.php: registers a artisan commands, channels.php: for broadcast
+channels; how server side communicates with front end; for important event happen in server and want user know
+without php reload, use event broadcast, api.php: registers clean route for API.
+- resources: js, sass, views that will be compiled down. "front end".
+- public: where compiled files will go. Any images you may have will be stored here. CSS and JS are commons
+from resources/js&css that are compiled down using laravel-mix in webpack.mix.js
+- database: factories: defines what a model or record may look like.
+- config: all configuration and setting for app, database, auth and mail.
+- boostrap: "تمهيد وتشغيل" how framework boots itself.
+- app: place where YOURS app lives ^.^. models, controllers and complex artisan commands 'Console',
+-- app/Http/Middleware: like layers of union. if user visits page, user's requests come and go through all of these
+layers of union: 7 layers or 5 as specified in http/kernel.php. Each of these layers has opportunity
+to response to the request.
+-- app/Providers: packages and components that make up laravel can hooked themselves into laravel
+through ServiceProviders. ServiceProviders are instructions of how hook a components in laravel
+
+.........................
+Factories provide a convenient way to generate new model instances for testing
+
+in php artisan tinker:
+
+// It will generate random and fake instance User not persist
+>>> factory(App/User::class)->make();
+
+// It will generate random and fake persist User
+>>> factory(App/User::class)->create();
+
+********************** End Episode 9 ********************** */
+
+/* ********************** Episode 10 **********************
+CSRF (Cross-Site Request Forgery):
+refers to an attack that secretly forces a user to unwittingly execute an action
+on a web application in which they're currently authenticated.
+
+we write {{ csrf_field() }} inside the form to avoid CSRF attack.
+
+********************** End Episode 10 ********************** */
+
+/* ********************** Episode 11 **********************
+
+---------- CRUD in Laravel ----------------
+
+/* Routing Conventions -- RESTFul Conventions--
+ *
+ *          GET /projects: Give me all the projects. The action func is 'index'
+
+ *          GET /projects/create: create object 'project'. The action func is 'create'
+
+ *          GET /projects/1: show object's details 'project'. The action func is 'show'
+
+ *          POST /projects: Add persist object 'project' to database. The action func is 'store'
+
+ *          GET /project/1/edit: edit existing resource using form. The action func is 'edit'
+
+ *          PUT like PATCH : update the resources 'like projects'.
+
+ *          PATCH /projects/1 : update the existing resource. e.g. object '1' in 'projects'. The action func is 'update'
+
+ *          DELETE /projects/1 : delete the existing resource. e.g. object '1' in 'projects'. The action func is 'destroy'
+ *
+ */
+
+// You can shortcut the previous Routing Conventions
+Route::resource('projects', 'ProjectsController');
+
+
+// To list all routing used in web.php
+$ php artisan route:list
+
+// To create controller with the resource methods 'in previous cmd'
+$ php artisan make:controller PostsController -r
+
+// To create controller with the resource methods 'in previous cmd' and create model for this controller
+$ php artisan make:controller PostsController -r -m Post
+
+We don't have to query database to find the project by entered ID. Laravel do it by default, if we write in function's
+parameter the model's name as parameter's type.
+It is great $.$ Laravel is Fantastiiiiiiiiiic. It is called "route model binding"
+
+********************** End Episode 11 ********************** */
+
+/* ********************** Episode 12 **********************
+
+Faking PATCH and DELETE Requests
+EPISODE 12 RUN TIME 10:07
+
+Browsers don't yet understand PATCH and DELETE request types for your forms.
+To get around this limitation, we'll use a bit of trickery to instruct Laravel which HTTP verb to assume.
+
+query the project by entered ID:
+$project = Project::find($id);
+
+query the project by entered ID or show styled message if not exist:
+$project = Project::findOrFail($id);
+
+
+To follow RESTFul approach, use 'PATCH' method for update project. However there is no method called 'Patch' we can use in browser.
+So, we use 'POST' method and secretly tell laravel about 'PATCH' method to rout to path's action:
+{{ method_field('PATCH')}} inside the form
+
+request()->all(); // to get all values of a form
+
+********************** End Episode 12 ********************** */
+
+/* ********************** Episode 13 **********************
+Form Delete Requests
+EPISODE 13 RUN TIME 5:23
+
+To delete an existing project, we'll need to create a second form that sends a DELETE request to the necessary endpoint.
+OR in delete button's properties:
+name="_method" value="DELETE"
+OR in delete button's properties:
+@method('DELETE');
+
+********************** End Episode 13 ********************** */
+
+/* ********************** Episode 14 **********************
+Cleaner Controllers and Mass Assignment Concerns
+EPISODE 14 RUN TIME 14:28
+
+route model binding: as told in Episode 11
+
+mass assignment: Try to assignment model's attributes at same time 'mass' which help attacker to manipulate them.
+$fillable: accept mass assignment.
+$guarded: doesn't accept mass assignment. If it's value is empty array []; then accept mass assignment of all model's attributes.
+
+//        Don't use request()->all with * protected guarded = []; * ----- It is mass assignment -----
+//        Project::create(request()->all());
+
+// like trying to change id if guarded = [];
+
+********************** End Episode 14 ********************** */
+
+/* ********************** Episode 15 **********************
+Two Layers of Validation
+EPISODE 15 RUN TIME 11:41
+
+When it comes to user-provided data, always take an approach of "guilty until proven innocent."
+With that in mind, we'll add two layers of validation: client-side and server-side.
+This will give us maximum assurance that we're receiving the correctly formatted input.Anything else will be rejected entirely.
+
+browser validation: like 'required' property in html tag. However, it can manipulated by users to avoid it.
+
+client-side validation:
+validate the requested data in store method - After submit the form:
+request()->validate([
+    'title' => ['required','min:3'],
+    'description' => 'required|min:3'
+]);
+if validation is failed - e.g.: manipulated by users and delete 'required' property -, it is redirected to previous page and
+sent thrown validation error. '$errors->all()' all() is helper function for errors object to get all errors.
+
+'{{ $errors->has('title')? 'is-danger' : ''}}' even $errors is empty -no error-, it still exists and can be referenced.
+{{ old('title') }} to get old value of session
+
+Search for 'Laravel validation rules', there are dozen of rules :)
+'confirmed' is used for check the second field of password is equal to first field.
+
+********************** End Episode 15 ********************** */
+
+/* ********************** Episode 16 **********************
+
+Your First Eloquent Relationships
+EPISODE 16 RUN TIME 8:23
+
+Eloquent ships with a handful of relationship methods to make the process of
+performing complex SQL queries as simple as calling a method.
+
+Create model with factory and migration:
+php artisan make:model Task -m -f
+
+Factory is a blueprint for a model.
+
+To add column's table of a model in database:
+add them in database->migration->..create_.._table.php
+
+then to submit the change 'add col to table' to database:
+$ php artisan migrate
+
+to associate task with project, use laravel Eloquent:
+in project model:
+public function tasks(){
+
+return $this->hasMany(Task::class);
+}
+
+// return tasks associated with project. Called it as property rather than function
+>>> App\Project::first()->tasks;
+
+
+Some of relationships:
+hasMany():
+if project has many tasks
+
+belongsTo():
+is reverse of hasMany(). if a task belong to a project.
+
+>>> App\Task::first(); // this is a query executed behind the scene.
+>>> App\Task::first()->project; // another query
+
+
+********************** End Episode 16 ********************** */
+
+/* ********************** Episode 17 **********************
+
+Form Action Considerations
+EPISODE 17 RUN TIME 8:06
+
+It's important to set aside an appropriate amount of time to consider your form endpoints.
+In this lesson, we'll review two common conventions you'll encounter in the wild.
+
+common conventions endpoints of tasks associated with project:
+- PATCH /projects/id/tasks/id
+- PATCH /tasks/id
+
+onChange="this.form.submit()" // to submit the form when change the checkbox
+
+It is clearer to called ProjectTasksController instead of TasksController which means manipulated tasks associated with project.
+
+return back(); // return to last page
+
+request()->has('completed') // return true if request has 'completed' key.
+
+
+
+********************** End Episode 17 ********************** */
+
+/* ********************** Episode 18 **********************
+Create New Project Tasks
+EPISODE 18 RUN TIME 9:57
+To add new tasks to our project page, we'll need to construct another form.
+This will give us the chance to once again discuss URI naming conventions, as well as basic encapsulation techniques.
+
+- send project id through the form or URI
+To create task:
+
+First Approach:
+- create a task in Task's store function:
+`Task::create();`
+
+Second Approach -preferable-:
+- create `addTask` function in Project Modal and called it in Task's store function
+`$this->tasks()->create(compact('description'));`
+use this approach because Laravel and Eloquent already notice this associated project and will apply project_is to new task.
+you don't need to provide project_id to new task, because Laravel and Eloquent are responsible to do that.
+
+// to include part in html:
+@include('errors') // it will call 'errors.blade.php'
+
+
+********************** End Episode 18 ********************** */
+
+/* ********************** Episode 19 **********************
+Better Encapsulation
+EPISODE 19 RUN TIME 8:09
+Let's talk about encapsulation a bit more. "Encapsulation" refers to the act of hiding values and state inside of a class.
+
+Controller doesn't care about Eloquent and relationship. Model who is the responsible about that.
+Controller doesn't need to awareness about underlying database
+
+Encapsulation is useful to know what model can do and offer.
+
+********************** End Episode 19 ********************** */
+
+/* ********************** Episode 20 **********************
+When in Doubt
+EPISODE 20 RUN TIME 5:29
+Extra Credit! When in doubt, create a new controller and return to REST.
+This is a technique that I've reached for countless times over the years.
+
+make controller for completed task that follow REST. One endpoint to store completed tasks and anther to destroy them.
+
+The new controller dedicated for manging and handling the state of completed tasks.
+
+It is an optional to create a controller to store the state, and depend on you.
+
+
+********************** End Episode 20 ********************** */
+
+/* ********************** Episode 21 **********************
+Core Concepts: Service Container and Auto-Resolution
+EPISODE 21 RUN TIME 15:25
+It's important that we take time to review the core concepts behind the Laravel framework.
+First up is two scary, but vitally important terms: service container and auto-resolution.
+Together, these two create the perfect one-two punch for your dependency resolving needs.
+
+Filesystem class: interact with files; fetch content of a file, read a file, ..
+
+Service container component:
+e.g: if you write `function show(Filesystem $file)`
+instead of `function show(Project $project)`
+
+Laravel will give you an instance of any class you typed.
+
+Behind the scene to make this work: Laravel uses two components:
+1- auto-resolving: Laravel able to use reflection API to figure out what it is you want.
+
+It reads 'Filesystem $file' in previous example, and figures out you need an instance of that class.
+
+the steps of that:
+1- check into of service container. It is a big box of key-value pair. Laravel look into that box.
+Do the 'Filesystem' -as in previous example- here? If exists, ooh that may what the user want.
+So, Laravel 'resolves' -fetch or get or request- out of that box -container- and pass it to user.
+
+Laravel application itself is a service container. You can get things of it using `app()` or `resolve()`,
+so, when you write:
+`dd(app(Filesystem::class))`, you will get the same result of:
+`function show(Filesystem $file){
+dd($file);
+}`
+
+to bind -put- element 'toy :)' in service container box:
+`app()->bind('example', function(){ // example is a name of element 'toy'. We give it a name to put it in the container.
+
+return new /App/Example; // Example is a class
+
+});
+`
+When I 'resolve' -fetch- 'example' element from the box, I fetch instance of 'Example' class -execute the function inside 'blind'-.
+
+`dd(app('example'),app('example'));` will give separate instances.
+
+if you want single instance 'Singleton' ot that element replace 'bind' with 'singleton'. The function inside 'singleton' execute only one time.
+
+if we try resolve -fetch- element that do not exist in service container, we will get:
+`ReflectionException`
+
+# Laravel do numbers of check -steps-:
+1- check if element inside the container.
+2- check outside of the container. Check the class name -full path- and instantiate instance from it. That what is called "Auto Resolving" $.$ e.g:
+`dd(app('\App\Example'));` is known by laravel $.$ even it isn't exists in service container.
+
+# e.g: if you want use Filesystem's instance in a function, you can do it by:
+1- function show(Filesystem $file){...} // Laravel instantiate instance automatically for you.
+OR 2- manually, $files = app('Illuminate\Filesystem\Filesystem');
+
+# Example of using service container:
+
+app()->singleton('twitter', function(){
+
+return new Twitter('affsfffss');
+});
+
+
+********************** End Episode 21 ********************** */
+
+/* ********************** Episode 22 **********************
+Core Concepts: Service Providers
+EPISODE 22 RUN TIME 15:31
+The second core concept: service providers.
+These classes are responsible for registering and bootstrapping a component with the Laravel framework.
+
+Directory: App\Providers
+if we think laravel as product of set of components. Each component need to be registered and known by Laravel framework.
+Register by Config\app.php. Every component should have a service provider.
+It is a class responsible for bootstrapping code or package with Laravel framework. It is a building block of laravel framework.
+
+Two core methods in service provider:
+register: where you bind things in service container.
+boot: fire up "called" when framework load up. It where reference anything that uses in Laravel framework.
+
+AppServiceProvider.php is good place fot twitter API or things like that.
+
+
+To create Service Provider:
+`php artisan make:provider Social`
+
+// Not always recommended, It often complicates the code.
+BackendServiceProvider: bind classes like interfaces with their implementations' class.
+`app()->bind(
+\Laracast\interfaces::class, // contract
+\Laracast\database::class // implementation
+);`
+
+********************** End Episode 22 ********************** */
+
+/* ********************** Episode 23 **********************
+Core Concepts: Configuration and Environments
+EPISODE 23 RUN TIME 11:45
+Our next core concept focuses on configuration. Luckily, Laravel makes
+environment-specific settings (development, testing, production, etc.) a breeze to setup and reference.
+
+config('services.twitter.key');
+# Key is preferable to write in .env then loaded by config `config('services.twitter.key')`.
+# config('services.twitter.key') is Key in Twitter array in config/services.php
+
+config files always contains a return statement.
+
+In production environment, it good to marge all files in config folder to single file 'cache' to load very very quickly,
+So, it is performance optimization:
+`php artisan config:cache `
+
+If the result not reflected in site, ask your self, will do I have cache version for config.
+So, it is not good for development environment. To clear config cache:
+`php artisan config:clear`
+
+********************** End Episode 23 ********************** */
+
+/* ********************** Episode 24 **********************
+A Full Registration System in Seconds
+EPISODE 24 RUN TIME 5:40
+Laravel includes a robust registration and authentication system out of the box.
+Run a single Artisan command, and, bam, you're ready to go!
+
+********************** End Episode 24 ********************** */
